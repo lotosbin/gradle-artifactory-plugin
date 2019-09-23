@@ -1,0 +1,172 @@
+def GROUP_ID = ext.GROUP_ID
+allprojects {
+    apply plugin: "com.jfrog.artifactory"
+    apply plugin: 'maven-publish'
+    apply from: "https://raw.githubusercontent.com/lotosbin/gradle-artifactory-plugin/master/script-git-version.gradle"
+}
+subprojects { project ->
+    if (project.name == "app") return
+    afterEvaluate {
+        task generateSourcesJar(type: Jar) {
+            from android.sourceSets.main.java.srcDirs
+            classifier 'sources'
+        }
+
+        task generateJavadocs(type: Javadoc) {
+            options.encoding = 'UTF-8'
+            //todo javadoc for kotlin
+            excludes = ['**/*.kt']
+            source = android.sourceSets.main.java.srcDirs
+            classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+            failOnError false
+        }
+
+        task generateJavadocsJar(type: Jar, dependsOn: generateJavadocs) {
+            from generateJavadocs.destinationDir
+            classifier 'javadoc'
+        }
+        artifacts {
+            archives generateJavadocsJar
+            archives generateSourcesJar
+        }
+        publishing {
+            publications {
+
+                aar(MavenPublication) {
+
+                    // Configure the publication here
+                    groupId GROUP_ID
+                    artifactId project.getName()
+                    version = gitVersionName
+                    artifact("${buildDir}/outputs/aar/${project.getName()}-release.aar")
+                    artifact generateJavadocsJar
+                    artifact generateSourcesJar
+                    pom.withXml {
+                        def dependencies = asNode().appendNode('dependencies')
+                        configurations.compile.allDependencies.each {
+                            println "compile ${it.group}:${it.name}:${it.version}"
+                            //note 约定project 依赖版本，所有gradle依赖都要指定版本
+                            if (it.version == "unspecified") {
+                                //项目依赖 转换成 gradle 依赖
+                                def dependency = dependencies.appendNode('dependency')
+                                dependency.appendNode('groupId', GROUP_ID)
+                                dependency.appendNode('artifactId', it.name)
+                                dependency.appendNode('version', gitVersionName)
+                            } else if (it.name != null && "unspecified" != it.name) {
+                                //gradle依赖
+                                if (it.version != null && it.version != "unspecified") {
+                                    def dependency = dependencies.appendNode('dependency')
+                                    dependency.appendNode('groupId', it.group)
+                                    dependency.appendNode('artifactId', it.name)
+                                    dependency.appendNode('version', it.version)
+                                    if (it.excludeRules.size() > 0) {
+                                        def exclusionsNode = dependency.appendNode('exclusions')
+                                        it.excludeRules.each { rule ->
+                                            def exclusionNode = exclusionsNode.appendNode('exclusion')
+                                            exclusionNode.appendNode('groupId', rule.group)
+                                            exclusionNode.appendNode('artifactId', rule.module)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (configurations.hasProperty("implementation")) {
+                            configurations.implementation.allDependencies.each {
+                                println "implementation ${it.group}:${it.name}:${it.version}"
+                                //note 约定project 依赖版本，所有gradle依赖都要指定版本
+                                if (it.version == "unspecified") {
+                                    //项目依赖 转换成 gradle 依赖
+                                    def dependency = dependencies.appendNode('dependency')
+                                    dependency.appendNode('groupId', GROUP_ID)
+                                    dependency.appendNode('artifactId', it.name)
+                                    dependency.appendNode('version', gitVersionName)
+                                } else if (it.name != null && "unspecified" != it.name) {
+                                    //gradle依赖
+                                    if ((it.version != null && it.version != "unspecified")) {
+                                        def dependency = dependencies.appendNode('dependency')
+                                        dependency.appendNode('groupId', it.group)
+                                        dependency.appendNode('artifactId', it.name)
+                                        dependency.appendNode('version', it.version)
+                                        if (it.excludeRules.size() > 0) {
+                                            def exclusionsNode = dependency.appendNode('exclusions')
+                                            it.excludeRules.each { rule ->
+                                                def exclusionNode = exclusionsNode.appendNode('exclusion')
+                                                exclusionNode.appendNode('groupId', rule.group)
+                                                exclusionNode.appendNode('artifactId', rule.module)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (configurations.hasProperty("api")) {
+                            configurations.api.allDependencies.each {
+                                println "api ${it.group}:${it.name}:${it.version}"
+                                //note 约定project 依赖版本，所有gradle依赖都要指定版本
+                                if (it.version == "unspecified") {
+                                    //项目依赖 转换成 gradle 依赖
+                                    def dependency = dependencies.appendNode('dependency')
+                                    dependency.appendNode('groupId', GROUP_ID)
+                                    dependency.appendNode('artifactId', it.name)
+                                    dependency.appendNode('version', gitVersionName)
+                                    dependency.appendNode('scope', 'api')
+                                } else if (it.name != null && "unspecified" != it.name) {
+                                    //gradle依赖
+                                    if ((it.version != null && it.version != "unspecified")) {
+                                        def dependency = dependencies.appendNode('dependency')
+                                        dependency.appendNode('groupId', it.group)
+                                        dependency.appendNode('artifactId', it.name)
+                                        dependency.appendNode('version', it.version)
+                                        dependency.appendNode('scope', 'api')
+                                        if (it.excludeRules.size() > 0) {
+                                            def exclusionsNode = dependency.appendNode('exclusions')
+                                            it.excludeRules.each { rule ->
+                                                def exclusionNode = exclusionsNode.appendNode('exclusion')
+                                                exclusionNode.appendNode('groupId', rule.group)
+                                                exclusionNode.appendNode('artifactId', rule.module)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        artifactory {
+            contextUrl = "${artifactory_contextUrl}"
+            //The base Artifactory URL if not overridden by the publisher/resolver
+            publish {
+                dependsOn {
+
+                    publications('aar')
+                }
+                repository {
+                    repoKey = 'gradle-release-local'
+                    username = "${artifactory_user}"
+                    password = "${artifactory_password}"
+                    maven = true
+
+                }
+                defaults {
+                    skip = true
+                    publications('aar')
+                    publishArtifacts = true
+                    properties = ['qa.level': 'basic', 'dev.team': 'core']
+                    publishPom = true
+                }
+            }
+            resolve {
+                repository {
+                    repoKey = 'gradle-release'
+                    username = "${artifactory_user}"
+                    password = "${artifactory_password}"
+                    maven = true
+                }
+            }
+        }
+        artifactoryPublish.dependsOn 'assembleRelease', 'generateSourcesJar', 'generateJavadocsJar'
+    }
+}
