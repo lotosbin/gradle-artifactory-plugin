@@ -34,6 +34,7 @@ subprojects { project ->
             publications {
 
                 aar(MavenPublication) {
+                    afterEvaluate{
                     if (isAndroidProject()) {
                         artifact bundleReleaseAar
                         // artifact androidJavadocsJar
@@ -45,6 +46,7 @@ subprojects { project ->
                         // artifact jar
                         // artifact sourcesJar
                         // artifact javadocJar
+                    }
                     }
                     // Configure the publication here
                     groupId GROUP_ID
