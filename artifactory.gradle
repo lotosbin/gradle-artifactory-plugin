@@ -3,6 +3,7 @@ allprojects {
     apply plugin: "com.jfrog.artifactory"
     apply plugin: 'maven-publish'
     apply from: "https://raw.githubusercontent.com/lotosbin/gradle-artifactory-plugin/master/script-git-version.gradle"
+    apply from: "https://raw.githubusercontent.com/lotosbin/gradle-artifactory-plugin/master/utils.gradle"
 }
 subprojects { project ->
     if (project.name == "app") return
@@ -33,14 +34,23 @@ subprojects { project ->
             publications {
 
                 aar(MavenPublication) {
-
+                    if (isAndroidProject()) {
+                        artifact bundleReleaseAar
+                        // artifact androidJavadocsJar
+                        // artifact androidSourcesJar
+                        // artifact("${buildDir}/outputs/aar/${project.getName()}-release.aar")
+                        artifact generateJavadocsJar
+                        artifact generateSourcesJar
+                    } else {
+                        // artifact jar
+                        // artifact sourcesJar
+                        // artifact javadocJar
+                    }
                     // Configure the publication here
                     groupId GROUP_ID
                     artifactId project.getName()
                     version = gitVersionName
-                    artifact("${buildDir}/outputs/aar/${project.getName()}-release.aar")
-                    artifact generateJavadocsJar
-                    artifact generateSourcesJar
+                 
                     pom.withXml {
                         def dependencies = asNode().appendNode('dependencies')
                         configurations.compile.allDependencies.each {

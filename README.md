@@ -26,5 +26,10 @@ artifactory_password=xxxx
 ./gradlew generatePomFileForAarPublication
 ```
 
+## other
+- project name 'app' is skipped
+- project dependency will handle as dependency ,ex. implementation project(':aaa') will handle as implementation '{GROUP_ID}:aaa:{currentVersion}'
+- same repository has same version
+
 ## Ref
 https://github.com/sky-uk/gradle-maven-plugin
