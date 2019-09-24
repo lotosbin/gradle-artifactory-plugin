@@ -1,4 +1,10 @@
 def GROUP_ID = ext.GROUP_ID
+buildscript {
+    dependencies {
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.7.3"
+    }
+}
 allprojects {
     apply plugin: "com.jfrog.artifactory"
     apply plugin: 'maven-publish'
