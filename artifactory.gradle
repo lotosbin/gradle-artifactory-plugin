@@ -47,20 +47,20 @@ subprojects { project ->
             publications {
 
                 aar(MavenPublication) {
-                    afterEvaluate{
-                    if (isAndroidProject()) {
+
+                    //if (isAndroidProject()) {
                         // artifact androidJavadocsJar
                         // artifact androidSourcesJar
                         // artifact(bundleReleaseAar)
                         artifact("${buildDir}/outputs/aar/${project.getName()}-release.aar")
                         artifact generateJavadocsJar
                         artifact generateSourcesJar
-                    } else {
+                    //} else {
                         // artifact jar
                         // artifact sourcesJar
                         // artifact javadocJar
-                    }
-                    }
+                    //}
+
                     // Configure the publication here
                     groupId GROUP_ID
                     artifactId project.getName()
