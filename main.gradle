@@ -1,2 +1,1 @@
-def PLUGIN_URL= ext.GRADLE_ARTIFACTORY_PLUGIN_URL ?: "https://raw.githubusercontent.com/lotosbin/gradle-artifactory-plugin/master"
-apply from: "$PLUGIN_URL/artifactory.gradle"
+apply from: "https://raw.githubusercontent.com/lotosbin/gradle-artifactory-plugin/master/artifactory.gradle"

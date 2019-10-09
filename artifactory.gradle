@@ -1,5 +1,4 @@
 def GROUP_ID = ext.GROUP_ID
-def PLUGIN_URL= ext.GRADLE_ARTIFACTORY_PLUGIN_URL ?: "https://raw.githubusercontent.com/lotosbin/gradle-artifactory-plugin/master"
 buildscript {
     repositories {
         maven { url "https://maven.aliyun.com/repository/google-plugin" }
@@ -16,8 +15,8 @@ buildscript {
 allprojects {
     apply plugin: "com.jfrog.artifactory"
     apply plugin: 'maven-publish'
-    apply from: "$PLUGIN_URL/script-git-version.gradle"
-    apply from: "$PLUGIN_URL/utils.gradle"
+    apply from: "https://raw.githubusercontent.com/lotosbin/gradle-artifactory-plugin/master/script-git-version.gradle"
+    apply from: "https://raw.githubusercontent.com/lotosbin/gradle-artifactory-plugin/master/utils.gradle"
 }
 subprojects { project ->
     if (project.name == "app") return

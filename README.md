@@ -1,17 +1,15 @@
 # gradle-artifactory-plugin
 ## Usage
+```groovy
+apply from: "https://raw.githubusercontent.com/lotosbin/gradle-artifactory-plugin/master/main.gradle"
+```
 
 /build.gradle
 ```groovy
 ext {
-    GRADLE_ARTIFACTORY_PLUGIN_URL="https://raw.githubusercontent.com/lotosbin/gradle-artifactory-plugin/master"
     GROUP_ID='xxxxx'
 }
 ```
-```groovy
-apply from: "${ext.GRADLE_ARTIFACTORY_PLUGIN_URL}/main.gradle"
-```
-
 /gradle.propertie or ~/.gradle/gradle.properies
 ```properties
 artifactory_contextUrl=xxxxx
