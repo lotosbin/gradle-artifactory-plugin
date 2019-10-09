@@ -4,12 +4,11 @@
 /build.gradle
 ```groovy
 ext {
-    GRADLE_ARTIFACTORY_PLUGIN_URL="https://raw.githubusercontent.com/lotosbin/gradle-artifactory-plugin/master"
     GROUP_ID='xxxxx'
 }
 ```
 ```groovy
-apply from: "${ext.GRADLE_ARTIFACTORY_PLUGIN_URL}/main.gradle"
+apply from: "${GRADLE_ARTIFACTORY_PLUGIN_URL}/main.gradle"
 ```
 
 /gradle.propertie or ~/.gradle/gradle.properies
@@ -17,6 +16,7 @@ apply from: "${ext.GRADLE_ARTIFACTORY_PLUGIN_URL}/main.gradle"
 artifactory_contextUrl=xxxxx
 artifactory_user=xxx
 artifactory_password=xxxx
+GRADLE_ARTIFACTORY_PLUGIN_URL=https://raw.githubusercontent.com/lotosbin/gradle-artifactory-plugin/master
 ```
 ## Library Publish
 ```shell
