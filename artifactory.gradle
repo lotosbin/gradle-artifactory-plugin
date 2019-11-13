@@ -41,7 +41,7 @@ subprojects { project ->
         }
         artifacts {
             archives generateJavadocsJar
-            archives generateSourcesJar
+            //archives generateSourcesJar
         }
         publishing {
             publications {
@@ -54,7 +54,7 @@ subprojects { project ->
                         // artifact(bundleReleaseAar)
                         artifact("${buildDir}/outputs/aar/${project.getName()}-release.aar")
                         artifact generateJavadocsJar
-                        artifact generateSourcesJar
+                        //artifact generateSourcesJar
                     //} else {
                         // artifact jar
                         // artifact sourcesJar
