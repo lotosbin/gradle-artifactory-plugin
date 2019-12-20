@@ -22,7 +22,7 @@ import org.ajoberstar.grgit.Grgit
 ext {
     git = Grgit.open(currentDir: projectDir)
     try{
-    gitVersionName = (git.describe() ?: "").replaceFirst(/\-/, ".") //eg. 3.0.1-102-g445e9ec -->  3.0.1.102-g445e9ec,否则 会造成新版排序较小
+    gitVersionName = "git describe --long".execute().text.replaceFirst(/-/, ".").replaceAll(/[\r\n ]*/, "") //eg. 3.0.1-102-g445e9ec -->  3.0.1.102-g445e9ec,否则 会造成新版排序较小
     }catch(Exception ex){
         println("git describe Catching the exception");
         gitVersionName = ""
